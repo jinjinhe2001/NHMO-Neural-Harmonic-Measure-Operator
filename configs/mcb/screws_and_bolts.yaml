@@ -1,0 +1,72 @@
+# MCB-B screws_and_bolts: per-category kernel K_theta, Stage 1 (30k steps).
+# Exact config stored in the released checkpoint checkpoints/3d/kernel_screws_and_bolts.pt.
+# Launch (initialized from the released warm-up checkpoint):
+#   python -m nhmo.train.mcb_main --config configs/mcb/screws_and_bolts.yaml \
+#       --warm-start checkpoints/3d/init/kernel3d_init_warmup.pt
+seed: 42
+encoder:
+  type: transolver
+  d_model: 192
+  n_slices: 64
+  n_layers: 4
+  n_heads: 4
+  mlp_ratio: 4
+  dropout: 0.0
+  pre_norm: true
+  use_normals: true
+  fourier_bands: 10
+kernel_head:
+  n_cross_layers: 2
+  d_model: 192
+  n_heads: 4
+  mlp_ratio: 4
+  dropout: 0.0
+  pre_norm: true
+  fourier_bands_p: 10
+  fourier_bands_zeta: 10
+  fourier_bands_normal: 4
+  log_K_max: 15.0
+kernel:
+  normalize: soft
+losses:
+  lambda_nll: 1.0
+  lambda_mv: 1.0
+  lambda_bl: 0.5
+  lambda_z: 1.0
+  z_huber_delta: 1.0
+  mean_value:
+    S: 32
+    r_frac_min: 0.2
+    r_frac_max: 0.9
+    r_floor_rel_bbox: 0.001
+    sample_log_uniform: true
+  boundary_limit:
+    epsilon: 0.02
+    gamma: 1.0
+    delta: 0.1
+data:
+  n_surface: 2000
+  n_interior_anchors: 512
+  n_wos_hits_per_query: 4
+  categories:
+  - screws_and_bolts
+  split: known_shape_known_prob
+  n_shapes: 200
+  grid_size: 32
+  n_queries: 8
+optim:
+  lr: 0.0003
+  weight_decay: 0.01
+  warmup_steps: 1000
+  total_steps: 30000
+  lr_min: 1.0e-05
+log:
+  run_name: mcb_screws_and_bolts_30k
+  log_every: 50
+  mv_every: 500
+  run_dir: ${RESULTS_DIR:-runs}/mcb_screws_and_bolts_30k
+  checkpoint_every: 2000
+wos:
+  backend: warp
+  epsilon: 0.001
+  max_steps: 128

@@ -1,0 +1,39 @@
+[build-system]
+requires = ["setuptools>=61", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "nhmo"
+version = "1.0.0"
+description = "Neural Harmonic Measure Operator (NeurIPS 2026)"
+readme = "README.md"
+license = { file = "LICENSE" }
+requires-python = ">=3.10"
+authors = [
+    { name = "Jinjin He" },
+    { name = "Sinan Wang" },
+    { name = "Yuchen Sun" },
+    { name = "Bo Zhu" },
+]
+# Versions used for every number in the paper and in the release verification
+# (Python 3.12.13, CUDA 13.0, NVIDIA A100-SXM4-80GB). See requirements.txt.
+dependencies = [
+    "torch>=2.4",
+    "numpy>=1.26",
+    "scipy>=1.11",
+    "scikit-image>=0.22",
+    "trimesh>=4.0",
+    "rtree>=1.0",
+    "warp-lang>=1.5",
+    "pyyaml>=6.0",
+]
+
+[project.optional-dependencies]
+ood3d = ["lapy>=1.0"]
+dev = ["pytest>=7.0"]
+
+[tool.setuptools.packages.find]
+include = ["nhmo*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

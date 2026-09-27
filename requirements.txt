@@ -1,0 +1,17 @@
+# Exact versions of the environment that produced and verified the released numbers
+# (Python 3.12.13, CUDA 13.0 driver 580.105.08, NVIDIA A100-SXM4-80GB).
+# Install PyTorch for your CUDA version first if the default wheel does not match,
+# see https://pytorch.org/get-started/locally/.
+torch==2.11.0
+numpy==2.4.4
+scipy==1.17.1
+scikit-image==0.26.0
+trimesh==4.11.5
+rtree==1.4.1
+warp-lang==1.12.0
+PyYAML==6.0.3
+
+# Optional: only for tools/gen_ood3d.py (3D coefficient-OOD FEM references).
+# lapy==1.6.0
+# Optional: to run the test through pytest (it also runs as a plain script).
+# pytest

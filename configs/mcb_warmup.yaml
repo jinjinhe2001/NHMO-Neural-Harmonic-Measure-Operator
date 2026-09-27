@@ -1,0 +1,60 @@
+# 3D warm-up on MCB-B (2k steps, soft normalization, L_MV dominant, L_BL off), started from the
+# sphere-pretrained checkpoint. Produces checkpoints/3d/init/kernel3d_init_warmup.pt.
+#   python -m nhmo.train.mcb_warmup --config configs/mcb_warmup.yaml --init runs/pretrain_sphere_10k/checkpoint_step_10000.pt
+seed: 0
+encoder:
+  d_model: 192
+  n_slices: 64
+  n_layers: 4
+  n_heads: 4
+  mlp_ratio: 4
+  dropout: 0.0
+  pre_norm: true
+  use_normals: true
+  fourier_bands: 10
+kernel_head:
+  n_cross_layers: 2
+  d_model: 192
+  n_heads: 4
+  mlp_ratio: 4
+  dropout: 0.0
+  pre_norm: true
+  fourier_bands_p: 10
+  fourier_bands_zeta: 10
+  fourier_bands_normal: 4
+  log_K_max: 15.0
+kernel:
+  normalize: soft
+losses:
+  lambda_nll: 0.3
+  lambda_mv: 3.0
+  lambda_bl: null
+  lambda_z: 1.0
+  lambda_analytic: null
+  z_huber_delta: 1.0
+  mean_value:
+    S: 4
+    r_frac_min: 0.2
+    r_frac_max: 0.9
+    r_floor_rel_bbox: 0.001
+    sample_log_uniform: true
+wos:
+  backend: warp
+  epsilon: 0.001
+  max_steps: 128
+data:
+  grid_size: 64
+  n_surface: 256
+  n_interior_anchors: 256
+  n_queries: 4
+  n_wos_hits_per_query: 4
+optim:
+  lr_start: 1.0e-05
+  lr_end: 0.0003
+  weight_decay: 0.01
+  total_steps: 2000
+  grad_clip_norm: 0.5
+log:
+  run_name: mcb_warmup_2k
+  run_dir: ${RESULTS_DIR:-runs}/mcb_warmup_2k
+  checkpoint_every: 500

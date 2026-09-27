@@ -1,0 +1,64 @@
+# 3D Stage 0: analytic sphere pretraining (10k steps, hard normalization, L_analytic).
+# Exact config of the pretraining run behind checkpoints/3d/init/kernel3d_init_warmup.pt.
+#   python -m nhmo.train.pretrain_analytic --config configs/pretrain_sphere.yaml
+seed: 42
+encoder:
+  d_model: 192
+  n_slices: 64
+  n_layers: 4
+  n_heads: 4
+  mlp_ratio: 4
+  dropout: 0.0
+  pre_norm: true
+  use_normals: true
+  fourier_bands: 10
+kernel_head:
+  n_cross_layers: 2
+  d_model: 192
+  n_heads: 4
+  mlp_ratio: 4
+  dropout: 0.0
+  pre_norm: true
+  fourier_bands_p: 10
+  fourier_bands_zeta: 10
+  fourier_bands_normal: 4
+kernel:
+  normalize: hard
+losses:
+  lambda_nll: 1.0
+  lambda_mv: 0.1
+  lambda_bl: null
+  lambda_z: 1.0
+  lambda_analytic: 10.0
+  mean_value:
+    S: 8
+    r_frac_min: 0.2
+    r_frac_max: 0.9
+    r_floor_rel_bbox: 0.001
+    sample_log_uniform: true
+wos:
+  backend: warp
+  epsilon: 0.001
+  max_steps: 128
+data:
+  grid_size: 64
+  n_surface: 256
+  n_interior_anchors: 128
+  n_queries: 8
+  n_wos_hits_per_query: 4
+pretrain_curriculum:
+  radius_base: 0.3
+  scale_min: 0.5
+  scale_max: 2.0
+  translate_max: 0.3
+  enable_rotation: true
+optim:
+  lr: 0.0003
+  lr_min: 1.0e-05
+  weight_decay: 0.01
+  warmup_steps: 500
+  total_steps: 10000
+log:
+  run_name: pretrain_sphere_10k
+  run_dir: ${RESULTS_DIR:-runs}/pretrain_sphere_10k
+  checkpoint_every: 1000

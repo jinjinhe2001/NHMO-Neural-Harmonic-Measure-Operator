@@ -1,0 +1,77 @@
+# 2D MNIST kernel (d=256 point-cloud encoder, no log-K cap, soft normalization).
+# Same model and optimizer blocks as the cfg stored in checkpoints/2d/kernel_2d_mask.pt. mnist_kde_main reads the
+# encoder / kernel_head / kernel blocks; the losses / data / optim blocks are kept for reference.
+seed: 42
+encoder:
+  type: transolver
+  d_model: 256
+  n_slices: 64
+  n_layers: 3
+  n_heads: 4
+  mlp_ratio: 4
+  dropout: 0.0
+  pre_norm: true
+  use_normals: true
+  fourier_bands: 8
+kernel_head:
+  n_cross_layers: 2
+  d_model: 256
+  n_heads: 4
+  mlp_ratio: 4
+  dropout: 0.0
+  pre_norm: true
+  fourier_bands_p: 10
+  fourier_bands_zeta: 10
+  fourier_bands_normal: 4
+  log_K_max: null
+  use_distance: true
+kernel:
+  normalize: soft
+losses:
+  lambda_nll: 1.0
+  lambda_mv: 2.0
+  lambda_bl: 0.5
+  lambda_z: 1.0
+  z_huber_delta: 1.0
+  mean_value:
+    S: 32
+    r_frac_min: 0.2
+    r_frac_max: 0.9
+    r_floor_rel_bbox: 0.001
+    sample_log_uniform: true
+  boundary_limit:
+    epsilon: 0.02
+    gamma: 1.0
+    delta: 0.1
+  lambda_analytic: null
+data:
+  n_surface: 2000
+  n_interior_anchors: 256
+  n_wos_hits_per_query: 4
+  mnist_local_root: ${MNIST_ROOT:-data/mnist}
+  split: train
+  n_shapes: 1000
+  grid_size: 64
+  n_total_samples: 512
+  n_surface_per_curve: 128
+  n_square_edge: 64
+  n_polyline_vertices: 200
+  keep_top_k_digit_contours: 4
+  n_surface_total: 512
+  n_queries: 8
+optim:
+  lr: 0.0003
+  weight_decay: 0.01
+  warmup_steps: 500
+  total_steps: 50000
+  lr_min: 1.0e-05
+log:
+  run_name: kernel_2d_mask
+  log_every: 50
+  mv_every: 500
+  run_dir: ${RESULTS_DIR:-runs}/kernel_2d_mask
+  checkpoint_every: 2000
+wos:
+  backend: warp
+  epsilon: 0.001
+  max_steps: 128
